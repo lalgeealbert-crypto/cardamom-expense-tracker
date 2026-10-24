@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardamom Plantation Expense Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== TOAST / CONFIRM ===================== -->
+<div id="toastContainer" class="toast-container"></div>
+<div id="confirmOverlay" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmMessage"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
+      <button class="btn btn-danger" id="confirmOk">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FIRST TIME SETUP ===================== -->
+<section id="setupScreen" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="brand-icon">🌿</div>
+        <h1>Cardamom Estate</h1>
+        <p class="subtitle">Expense Tracker — First-Time Setup</p>
+      </div>
+      <form id="setupForm">
+        <h3 class="section-title">Create Admin Account</h3>
+        <div class="field">
+          <label>Admin Username</label>
+          <input type="text" id="setupAdminUser" required placeholder="e.g. admin">
+        </div>
+        <div class="field">
+          <label>Admin Password</label>
+          <input type="password" id="setupAdminPass" required placeholder="Choose a password" minlength="4">
+        </div>
+        <h3 class="section-title">Create First User Account</h3>
+        <div class="field">
+          <label>User Username</label>
+          <input type="text" id="setupUserUser" required placeholder="e.g. staff1">
+        </div>
+        <div class="field">
+          <label>User Password</label>
+          <input type="password" id="setupUserPass" required placeholder="Choose a password" minlength="4">
+        </div>
+        <p class="security-note">⚠️ This app stores data only in your browser's Local Storage. It is a prototype, not a secure production system. Passwords are stored in your browser and are not encrypted at a professional standard — anyone with access to this browser/device could view the stored data. Do not use real sensitive financial information.</p>
+        <button type="submit" class="btn btn-primary btn-block">Create Accounts & Continue</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<section id="loginScreen" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="brand-icon">🌿</div>
+        <h1>Cardamom Estate</h1>
+        <p class="subtitle">Plantation Expense Tracker</p>
+      </div>
+      <form id="loginForm">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="loginUser" required autocomplete="username">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPass" required autocomplete="current-password">
+        </div>
+        <div id="loginError" class="form-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+      <p class="security-note">⚠️ Prototype only: authentication and roles are enforced by client-side JavaScript and Local Storage, not a secure server. Anyone with browser dev-tools access could bypass this. Do not rely on this for sensitive data.</p>
+      <button id="resetAppLink" class="link-btn">Reset application data</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MAIN APP ===================== -->
+<section id="appScreen" class="screen hidden">
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">🌿</span>
+        <span class="brand-text">Cardamom Estate</span>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar" id="sidebarAvatar">U</div>
+          <div class="user-meta">
+            <div id="sidebarUserName">User</div>
+            <div id="sidebarUserRole" class="role-badge">role</div>
+          </div>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost btn-block">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="hamburger" id="hamburgerBtn">☰</button>
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="topbar-actions">
+          <button id="addExpenseTopBtn" class="btn btn-primary">+ Add Expense</button>
+        </div>
+      </header>
+
+      <div class="content-area" id="contentArea">
+        <!-- views injected here -->
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- ===================== EXPENSE FORM MODAL ===================== -->
+<div id="expenseModalOverlay" class="modal-overlay hidden">
+  <div class="modal-box modal-wide">
+    <h3 id="expenseModalTitle">Add Expense</h3>
+    <form id="expenseForm">
+      <div id="expenseFormFields" class="form-grid"></div>
+      <div id="expenseFormError" class="form-error hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="expenseCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Expense</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== CATEGORY MODAL ===================== -->
+<div id="categoryModalOverlay" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3 id="categoryModalTitle">Add Category</h3>
+    <form id="categoryForm">
+      <div class="field">
+        <label>Category Name</label>
+        <input type="text" id="categoryNameInput" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="categoryCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== CUSTOM FIELD MODAL ===================== -->
+<div id="fieldModalOverlay" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3 id="fieldModalTitle">Add Custom Field</h3>
+    <form id="fieldForm">
+      <div class="field">
+        <label>Field Label</label>
+        <input type="text" id="fieldLabelInput" required placeholder="e.g. Weather Condition">
+      </div>
+      <div class="field">
+        <label>Field Type</label>
+        <select id="fieldTypeInput">
+          <option value="text">Text</option>
+          <option value="number">Number</option>
+          <option value="date">Date</option>
+          <option value="dropdown">Dropdown</option>
+        </select>
+      </div>
+      <div class="field" id="fieldOptionsWrap" style="display:none;">
+        <label>Dropdown Options (comma-separated)</label>
+        <input type="text" id="fieldOptionsInput" placeholder="e.g. Sunny, Rainy, Cloudy">
+      </div>
+      <div class="field checkbox-field">
+        <label><input type="checkbox" id="fieldRequiredInput"> Required field</label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="fieldCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Field</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== USER MODAL ===================== -->
+<div id="userModalOverlay" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3 id="userModalTitle">Add User</h3>
+    <form id="userForm">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="userUsernameInput" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="userPasswordInput" placeholder="Leave blank to keep unchanged (edit mode)">
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <select id="userRoleInput">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="field checkbox-field">
+        <label><input type="checkbox" id="userActiveInput" checked> Active</label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="userCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Hidden file input for JSON import -->
+<input type="file" id="importFileInput" accept="application/json" style="display:none;">
+
+<script src="script.js"></script>
+</body>
+</html>
